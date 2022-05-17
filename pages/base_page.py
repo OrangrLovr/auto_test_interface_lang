@@ -1,22 +1,42 @@
-from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException, TimeoutException
 from math import sin, log
+from .locators import BasePageLocatores
 
 class BasePage():
-
-    def __init__(self, browser, url, timeout=10):
+    # timeout=10 
+    def __init__(self, browser, url):
         self.browser = browser
         self.url = url
         # реализация неявного ожидания = 10 сек
-        self.browser.implicitly_wait(timeout)
+        #self.browser.implicitly_wait(timeout)
 
     def open(self):
         self.browser.get(self.url)
 
-    # Метод для перехвата исключения
+    # Проверка - элемент появляется на странице
     def is_element_present(self, how, what):
         try:
             self.browser.find_element(how, what)
         except NoSuchElementException:
+            return False
+        return True
+
+    # Проверка - элемент не появляется на странице
+    def is_not_element_present(self, how, what, timeout=4):
+        try:
+            WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located((how, what)))
+        except TimeoutException:
+            return True
+        return False
+
+    # Проверка - какой-то элемент исчезнет
+    def is_disappeared(self, how, what, timeout=4):
+        try:
+            WebDriverWait(self.browser, timeout, 1, TimeoutException).\
+                until_not(EC.presence_of_element_located((how, what)))
+        except TimeoutException:
             return False
         return True
 
@@ -35,3 +55,12 @@ class BasePage():
             alert.accept()
         except NoAlertPresentException:
             print("No second alert presented")
+    
+    # заведомо провальный тест
+    # можно использовать Try-block или mark xfail в тесте
+    def go_to_login_page(self):
+        link = self.browser.find_element(*BasePageLocatores.LOGIN_LINK_INVALID)
+        link.click()
+
+    def should_be_login_link(self):
+        assert self.is_element_present(*BasePageLocatores.LOGIN_LINK)

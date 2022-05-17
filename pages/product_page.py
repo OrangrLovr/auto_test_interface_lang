@@ -6,6 +6,34 @@ class ProductPage(BasePage):
     product_price = ''
     product_desription = ''
 
+    # not adding
+    def cant_see_success_message_after_adding_product_to_basket(self):
+        self.should_be_name()
+        self.should_be_price()
+        self.should_be_desription()
+        self.should_be_add_button()
+
+        btn = self.browser.find_element(*ProductPageLocators.BTN_ADD_TO_BASKET)
+        btn.click()
+
+        self.should_be_success()
+        self.check_success_message()
+        self.should_not_be_success()
+    
+    # the element has disappeared
+    def message_disappeared_after_adding_product_to_basket(self):
+        self.should_be_name()
+        self.should_be_price()
+        self.should_be_desription()
+        self.should_be_add_button()
+
+        btn = self.browser.find_element(*ProductPageLocators.BTN_ADD_TO_BASKET)
+        btn.click()
+
+        self.should_is_disappeared()
+        self.check_success_message()
+
+    # successful addition
     def add_product_to_basket(self):
         self.should_be_name()
         self.should_be_price()
@@ -38,6 +66,14 @@ class ProductPage(BasePage):
     def should_be_success(self):
         assert self.is_element_present(*ProductPageLocators.SUCCESS_MESSAGES), "Message of Succes added product in " \
             "basket not found"
+
+    # check not text 
+    def should_not_be_success(self):
+        assert self.is_not_element_present(*ProductPageLocators.SUCCESS_MESSAGES), "Success message is presented, but should not be"
+
+    # check element dissapeared
+    def should_is_disappeared(self):
+        assert self.is_disappeared(*ProductPageLocators.SUCCESS_MESSAGES), "Success message is dissappeared"
 
     # check button add
     def should_be_add_button(self):
