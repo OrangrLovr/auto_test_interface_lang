@@ -56,11 +56,13 @@ class BasePage():
         except NoAlertPresentException:
             print("No second alert presented")
     
-    # заведомо провальный тест
-    # можно использовать Try-block или mark xfail в тесте
     def go_to_login_page(self):
-        link = self.browser.find_element(*BasePageLocatores.LOGIN_LINK_INVALID)
+        link = self.browser.find_element(*BasePageLocatores.LOGIN_LINK)
         link.click()
 
     def should_be_login_link(self):
         assert self.is_element_present(*BasePageLocatores.LOGIN_LINK)
+
+    def should_be_authorized_user(self):
+        assert self.is_element_present(*BasePageLocatores.USER_ICON), "User icon is not presented," \
+            "probably unauthorised user"
